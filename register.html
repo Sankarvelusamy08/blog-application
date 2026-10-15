@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Account - BlogSpace</title>
+  <meta name="description" content="Join BlogSpace to publish technical writings, build your engineering brand, and engage with modern creators." />
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="brand-logo">
+        <span class="brand-icon">⚡</span>
+        <span>Blog<span class="gradient-text">Space</span></span>
+      </a>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode"></button>
+        <a href="login.html" class="btn btn-secondary btn-sm">Already a member? Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 class="auth-title">Join <span class="gradient-text">BlogSpace</span></h1>
+        <p class="auth-subtitle">Publish your thinking, build authority, and inspire engineers.</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="regName" class="form-label">Full Name</label>
+          <div class="form-input-wrap">
+            <input type="text" id="regName" class="form-input" placeholder="e.g. Maya Patel" required autocomplete="name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail" class="form-label">Email Address</label>
+          <div class="form-input-wrap">
+            <input type="email" id="regEmail" class="form-input" placeholder="name@domain.com" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword" class="form-label">Password (min 6 characters)</label>
+          <div class="form-input-wrap">
+            <input type="password" id="regPassword" class="form-input" placeholder="Create a secure password" minlength="6" required autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirmPassword" class="form-label">Confirm Password</label>
+          <div class="form-input-wrap">
+            <input type="password" id="regConfirmPassword" class="form-input" placeholder="Repeat your password" minlength="6" required autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label" style="font-size: 0.85rem;">
+            <input type="checkbox" id="termsCheck" required checked />
+            <span>I agree to the <a href="#" style="color: var(--accent-primary);">Terms of Service</a> & <a href="#" style="color: var(--accent-primary);">Privacy Policy</a></span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Create Free Account
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

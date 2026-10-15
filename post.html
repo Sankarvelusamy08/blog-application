@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article - BlogSpace</title>
+  <meta name="description" content="Read full technical article on BlogSpace." />
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="brand-logo">
+        <span class="brand-icon">⚡</span>
+        <span>Blog<span class="gradient-text">Space</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="create-blog.html" class="nav-link">Write</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode"></button>
+        <div id="navAuthContainer"></div>
+        <button class="mobile-menu-toggle" id="mobileToggle" aria-label="Open Mobile Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="post-detail-wrapper">
+    <article id="postDetailContainer">
+      <!-- Dynamically rendered by app.js based on ?id= -->
+      <div style="text-align: center; padding: 4rem 0;">
+        <p style="color: var(--text-muted);">Loading article...</p>
+      </div>
+    </article>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="brand-icon">⚡</span>
+            <span>Blog<span class="gradient-text">Space</span></span>
+          </a>
+          <p>
+            An open platform for sharing thoughtful engineering deep-dives, design explorations, and tech innovations.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Explore</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard</a></li>
+            <li><a href="create-blog.html" class="footer-link">Write Story</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Account</h4>
+          <ul class="footer-links">
+            <li><a href="login.html" class="footer-link">Sign In</a></li>
+            <li><a href="register.html" class="footer-link">Register</a></li>
+            <li><a href="dashboard.html" class="footer-link">My Stories</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Connect</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">LinkedIn</a></li>
+            <li><a href="#" class="footer-link">GitHub</a></li>
+            <li><a href="#" class="footer-link">Twitter / X</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 BlogSpace. Built for Frontend Development Module 1.</p>
+        <div style="display: flex; gap: 1rem;">
+          <a href="index.html" class="footer-link">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
