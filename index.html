@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BlogSpace - Discover Stories, Thinking & Expertise</title>
-  <meta name="description" content="A modern, high-performance blogging platform for tech enthusiasts, designers, and thinkers to share ideas and connect." />
+  <title>BlogSpace - Engineering Stories, Architecture & Design</title>
+  <meta name="description" content="A modern, high-performance publishing platform for engineers, architects, and product designers to explore modern computing." />
   
-  <!-- Favicon icon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>" />
   
-  <!-- Google Fonts & Stylesheet -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <div class="reading-progress-bar" id="readingProgressBar"></div>
 
-  <!-- Top Sticky Navigation -->
+  <!-- Sticky Glass Navbar -->
   <header class="navbar">
     <div class="container navbar-container">
       <a href="index.html" class="brand-logo" id="brandLogo">
-        <span class="brand-icon">⚡</span>
+        <div class="brand-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </div>
         <span>Blog<span class="gradient-text">Space</span></span>
       </a>
 
@@ -28,13 +28,13 @@
         <ul class="nav-links" id="navLinks">
           <li><a href="index.html" class="nav-link active">Home</a></li>
           <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="create-blog.html" class="nav-link">Write</a></li>
+          <li><a href="create-blog.html" class="nav-link">Write Story</a></li>
           <li><a href="#newsletterSection" class="nav-link">Newsletter</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
-        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme">
           <!-- Populated by JS -->
         </button>
 
@@ -43,7 +43,7 @@
         </div>
 
         <button class="mobile-menu-toggle" id="mobileToggle" aria-label="Open Mobile Menu">
-          ☰
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
       </div>
     </div>
@@ -53,36 +53,56 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="container">
-        <div class="hero-pill">
-          <span>✨</span>
-          <span>Explore the cutting edge of Web & AI</span>
+        <div class="hero-pill-badge">
+          <span class="pulse-dot"></span>
+          <span>Next-Gen Engineering Perspectives & Architecture</span>
         </div>
+
         <h1 class="hero-title">
-          Where Great Ideas Find Their <span class="gradient-text">Digital Home</span>
+          Where Visionary Engineers Share <br />
+          <span class="gradient-text">World-Class Software</span> Insights
         </h1>
+
         <p class="hero-subtitle">
-          Read deep architectural analyses, cutting-edge UI engineering, and design stories from creators shaping tomorrow's web.
+          Curated deep-dives on high-performance frontend architecture, distributed systems, modern CSS primitives, and practical agentic AI workflows.
         </p>
 
-        <!-- Search Bar -->
+        <!-- Search with Keyboard Badge -->
         <div class="hero-search-wrapper">
           <div class="search-input-group">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted); margin-right: 0.5rem;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="homeSearchInput" placeholder="Search by topic, keyword, or author..." aria-label="Search articles" />
-            <a href="create-blog.html" class="btn btn-primary btn-sm">Start Writing</a>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-dim);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="homeSearchInput" placeholder="Search by topic, architecture, or author..." aria-label="Search articles" />
+            <span class="kbd-badge">Ctrl K</span>
+            <a href="create-blog.html" class="btn btn-primary btn-sm">Write Story</a>
           </div>
         </div>
 
-        <!-- Filter Tags -->
+        <!-- Metric Social Proof Indicators -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 3.5rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-dim);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span><strong>24,000+</strong> Monthly Readers</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-dim);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span><strong>1,200+</strong> Curated Stories</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-dim);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pink)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <span>Top Tier Tech Writers</span>
+          </div>
+        </div>
+
+        <!-- Category Pills -->
         <div class="category-filters" id="categoryFilters">
           <!-- Populated by JS -->
         </div>
       </div>
     </section>
 
-    <!-- Main Content Container -->
+    <!-- Main Content Grid -->
     <div class="container">
-      <!-- Featured Post Banner -->
+      <!-- Editorial Featured Post Spotlight -->
       <section class="featured-section" id="featuredPostContainer">
         <!-- Rendered by JS -->
       </section>
@@ -91,11 +111,12 @@
       <section>
         <div class="section-header">
           <div>
-            <h2 class="section-title">Latest Articles</h2>
-            <p class="section-subtitle">Freshly curated perspectives from engineering leaders</p>
+            <h2 class="section-title">Trending Perspectives</h2>
+            <p class="section-subtitle">Freshly published insights from verified tech architects</p>
           </div>
-          <a href="create-blog.html" class="btn btn-outline btn-sm">
-            <span>+ Write New</span>
+          <a href="create-blog.html" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Publish Article</span>
           </a>
         </div>
 
@@ -104,15 +125,15 @@
         </div>
       </section>
 
-      <!-- Newsletter Section -->
+      <!-- Newsletter SaaS Section -->
       <section class="newsletter-banner" id="newsletterSection">
-        <h2 class="newsletter-title">Stay Ahead of the <span class="gradient-text">Curve</span></h2>
+        <h2 class="newsletter-title">Stay Ahead of Modern <span class="gradient-text">Computing</span></h2>
         <p class="newsletter-desc">
-          Receive our weekly digest with the highest-rated frontend architecture, design patterns, and engineering insights directly in your inbox.
+          Get weekly curated deep dives on distributed architecture, modern CSS techniques, and engineering leadership directly to your inbox.
         </p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('Subscribed successfully! Thank you 🎉', 'success'); this.reset();">
-          <input type="email" class="newsletter-input" placeholder="Enter your email address" required aria-label="Email address" />
-          <button type="submit" class="btn btn-primary">Subscribe</button>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('Subscribed to BlogSpace Digest! Welcome aboard 🎉', 'success'); this.reset();">
+          <input type="email" class="newsletter-input" placeholder="Enter your work email address" required aria-label="Email address" />
+          <button type="submit" class="btn btn-primary">Join 24k Readers</button>
         </form>
       </section>
     </div>
@@ -124,21 +145,23 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="index.html" class="brand-logo">
-            <span class="brand-icon">⚡</span>
+            <div class="brand-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
             <span>Blog<span class="gradient-text">Space</span></span>
           </a>
           <p>
-            An open platform for sharing thoughtful engineering deep-dives, design explorations, and tech innovations.
+            An enterprise-grade open technical publishing platform dedicated to clean code, modular architecture, and modern web innovation.
           </p>
         </div>
 
         <div>
-          <h4 class="footer-title">Explore</h4>
+          <h4 class="footer-title">Platform</h4>
           <ul class="footer-links">
-            <li><a href="index.html" class="footer-link">Home</a></li>
-            <li><a href="dashboard.html" class="footer-link">Dashboard</a></li>
-            <li><a href="create-blog.html" class="footer-link">Create Blog</a></li>
-            <li><a href="index.html#categoryFilters" class="footer-link">Topics</a></li>
+            <li><a href="index.html" class="footer-link">Explore Stories</a></li>
+            <li><a href="dashboard.html" class="footer-link">Author Dashboard</a></li>
+            <li><a href="create-blog.html" class="footer-link">Markdown Editor</a></li>
+            <li><a href="#newsletterSection" class="footer-link">Engineering Digest</a></li>
           </ul>
         </div>
 
@@ -146,28 +169,28 @@
           <h4 class="footer-title">Account</h4>
           <ul class="footer-links">
             <li><a href="login.html" class="footer-link">Sign In</a></li>
-            <li><a href="register.html" class="footer-link">Register</a></li>
-            <li><a href="dashboard.html" class="footer-link">My Stories</a></li>
+            <li><a href="register.html" class="footer-link">Join Platform</a></li>
+            <li><a href="dashboard.html" class="footer-link">Performance Metrics</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-title">Stack & Info</h4>
+          <h4 class="footer-title">Engineering</h4>
           <ul class="footer-links">
-            <li><span class="footer-link" style="color: var(--text-muted);">HTML5 & Vanilla CSS</span></li>
-            <li><span class="footer-link" style="color: var(--text-muted);">Vanilla JavaScript (ES6+)</span></li>
-            <li><span class="footer-link" style="color: var(--text-muted);">LocalStorage Architecture</span></li>
-            <li><span class="footer-link" style="color: var(--text-muted);">Module 1 Submission</span></li>
+            <li><span class="footer-link" style="color: var(--text-dim);">HTML5 Semantics</span></li>
+            <li><span class="footer-link" style="color: var(--text-dim);">Pure CSS3 Design System</span></li>
+            <li><span class="footer-link" style="color: var(--text-dim);">ES6+ LocalStorage Store</span></li>
+            <li><span class="footer-link" style="color: var(--text-dim);">Module 1 Final Project</span></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2026 BlogSpace. Crafted with passion for modern web engineering.</p>
-        <div style="display: flex; gap: 1rem;">
-          <a href="#" class="footer-link">Privacy</a>
-          <a href="#" class="footer-link">Terms</a>
-          <a href="#" class="footer-link">GitHub</a>
+        <p>&copy; 2026 BlogSpace Inc. Built for Frontend Engineering Excellence.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">System Status</a>
         </div>
       </div>
     </div>

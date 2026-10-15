@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create New Story - BlogSpace</title>
-  <meta name="description" content="Write and publish technical articles, tutorials, and insights to the BlogSpace community." />
+  <title>Article Studio - BlogSpace</title>
+  <meta name="description" content="Author and publish engineering insights with real-time markdown preview and image telemetry." />
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <!-- Top Sticky Navigation -->
+  <!-- Sticky Glass Navbar -->
   <header class="navbar">
     <div class="container navbar-container">
       <a href="index.html" class="brand-logo">
-        <span class="brand-icon">⚡</span>
+        <div class="brand-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </div>
         <span>Blog<span class="gradient-text">Space</span></span>
       </a>
 
@@ -23,14 +25,16 @@
         <ul class="nav-links" id="navLinks">
           <li><a href="index.html" class="nav-link">Home</a></li>
           <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="create-blog.html" class="nav-link active">Write</a></li>
+          <li><a href="create-blog.html" class="nav-link active">Write Story</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
-        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode"></button>
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme"></button>
         <div id="navAuthContainer"></div>
-        <button class="mobile-menu-toggle" id="mobileToggle" aria-label="Open Mobile Menu">☰</button>
+        <button class="mobile-menu-toggle" id="mobileToggle" aria-label="Open Mobile Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -38,29 +42,37 @@
   <main class="editor-wrapper">
     <div class="container">
       <div class="editor-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h1 style="font-size: 1.85rem;">Draft a New <span class="gradient-text">Story</span></h1>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Share your code, architectural breakthroughs, and thoughts.</p>
+            <h1 style="font-size: 2rem;">Draft an <span class="gradient-text">Engineering Story</span></h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+              Format with markdown, embed architecture snippets, and broadcast to the community.
+            </p>
           </div>
-          <a href="dashboard.html" class="btn btn-secondary btn-sm">Discard</a>
+          
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-dim);" id="editorStats">
+              <span id="wordCount">0</span> words · <span id="readTimeEst">1 min</span> read
+            </div>
+            <a href="dashboard.html" class="btn btn-outline btn-sm">Exit Studio</a>
+          </div>
         </div>
 
         <!-- Editor vs Preview Tabs -->
         <div class="editor-tabs">
-          <button type="button" class="editor-tab-btn active" id="tabWrite">Editor</button>
-          <button type="button" class="editor-tab-btn" id="tabPreview">Live Preview</button>
+          <button type="button" class="editor-tab-btn active" id="tabWrite">Editor & Markdown</button>
+          <button type="button" class="editor-tab-btn" id="tabPreview">Live Article Preview</button>
         </div>
 
         <form id="createBlogForm">
           <div class="form-group">
-            <label for="blogTitleInput" class="form-label">Article Title</label>
-            <input type="text" id="blogTitleInput" class="form-input" placeholder="e.g. Architecting Scalable Design Systems in 2026" required style="font-size: 1.15rem; font-weight: 600;" />
+            <label for="blogTitleInput" class="form-label">Article Headline</label>
+            <input type="text" id="blogTitleInput" class="form-input" placeholder="e.g. Architecting Distributed Micro-Frontends with Edge Computing" required style="font-size: 1.25rem; font-weight: 700; padding: 0.95rem 1.25rem;" />
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="blogCategorySelect" class="form-label">Category</label>
+              <label for="blogCategorySelect" class="form-label">Topic Taxonomy</label>
               <select id="blogCategorySelect" class="form-input" required>
                 <option value="Web Dev">Web Dev</option>
                 <option value="AI & ML">AI & ML</option>
@@ -72,14 +84,22 @@
 
             <div class="form-group" style="margin-bottom: 0;">
               <label for="blogTagsInput" class="form-label">Tags (comma separated)</label>
-              <input type="text" id="blogTagsInput" class="form-input" placeholder="CSS, React, Architecture" />
+              <input type="text" id="blogTagsInput" class="form-input" placeholder="DistributedSystems, React, CSS" />
             </div>
           </div>
 
-          <!-- Cover Image URL & Live Preview -->
+          <!-- Cover Image URL -->
           <div class="form-group">
-            <label for="coverUrlInput" class="form-label">Featured Cover Image URL</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <label for="coverUrlInput" class="form-label" style="margin-bottom: 0;">Featured Cover Image URL</label>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Presets: 
+                <a href="#" style="color: var(--accent-light);" onclick="event.preventDefault(); document.getElementById('coverUrlInput').value='https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80'; document.getElementById('coverUrlInput').dispatchEvent(new Event('input'));">Tech</a> · 
+                <a href="#" style="color: var(--accent-light);" onclick="event.preventDefault(); document.getElementById('coverUrlInput').value='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80'; document.getElementById('coverUrlInput').dispatchEvent(new Event('input'));">Design</a> · 
+                <a href="#" style="color: var(--accent-light);" onclick="event.preventDefault(); document.getElementById('coverUrlInput').value='https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1000&q=80'; document.getElementById('coverUrlInput').dispatchEvent(new Event('input'));">AI</a>
+              </span>
+            </div>
             <input type="url" id="coverUrlInput" class="form-input" placeholder="https://images.unsplash.com/photo-..." value="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80" />
+            
             <div class="image-preview-box" id="imagePreview">
               <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80" alt="Cover Preview" />
             </div>
@@ -88,31 +108,31 @@
           <!-- Write Tab Body -->
           <div id="editorArea">
             <div class="form-group">
-              <label for="blogContentInput" class="form-label">Story Body (Markdown Supported)</label>
+              <label for="blogContentInput" class="form-label">Article Body</label>
               <!-- Formatting Toolbar -->
               <div class="editor-toolbar">
                 <button type="button" class="toolbar-btn" onclick="insertFormatting('**', '**')" title="Bold"><b>B</b></button>
                 <button type="button" class="toolbar-btn" onclick="insertFormatting('*', '*')" title="Italic"><i>I</i></button>
                 <button type="button" class="toolbar-btn" onclick="insertFormatting('## ')" title="Heading 2">H2</button>
                 <button type="button" class="toolbar-btn" onclick="insertFormatting('### ')" title="Heading 3">H3</button>
-                <button type="button" class="toolbar-btn" onclick="insertFormatting('> ')" title="Quote">” Quote</button>
+                <button type="button" class="toolbar-btn" onclick="insertFormatting('> ')" title="Blockquote">” Quote</button>
                 <button type="button" class="toolbar-btn" onclick="insertFormatting('```js\n', '\n```')" title="Code Block">{ } Code</button>
-                <button type="button" class="toolbar-btn" onclick="insertFormatting('[Link Text](', ')')" title="Hyperlink">🔗 Link</button>
+                <button type="button" class="toolbar-btn" onclick="insertFormatting('[Title](', ')')" title="Link">🔗 Link</button>
               </div>
-              <textarea id="blogContentInput" class="editor-textarea" placeholder="Write your story here... Feel free to structure it with headings, quotes, and code blocks." required></textarea>
+              <textarea id="blogContentInput" class="editor-textarea" placeholder="Start drafting your article... Use markdown headers (##), blockquotes (>), or code fences (```)." required></textarea>
             </div>
           </div>
 
           <!-- Live Preview Tab Body -->
-          <div id="livePreviewArea" style="display: none; min-height: 280px; padding: 1.5rem; background: var(--bg-input); border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+          <div id="livePreviewArea" style="display: none; min-height: 320px; padding: 2rem; background: var(--bg-input); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-bottom: 2rem;">
             <!-- Populated dynamically on preview tab click -->
           </div>
 
           <div style="display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-            <button type="button" class="btn btn-secondary" onclick="showToast('Draft auto-saved to local state', 'info')">Save as Draft</button>
+            <button type="button" class="btn btn-secondary" onclick="showToast('Draft safely stored in browser session', 'info')">Save as Draft</button>
             <button type="submit" class="btn btn-primary" id="publishBtn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              <span>Publish Story</span>
+              <span>Publish to Community</span>
             </button>
           </div>
         </form>
