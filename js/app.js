@@ -9,8 +9,8 @@
 // ==========================================
 const DEFAULT_USER = {
   id: "user-1",
-  name: "Alex Morgan",
-  email: "alex@blogspace.dev",
+  name: "Sankar Velusamy",
+  email: "sankar@blogspace.dev",
   password: "password123",
   avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
   role: "Principal Frontend Architect",
@@ -53,7 +53,7 @@ You gain predictable cascading behavior, regardless of file load order or select
     tags: ["CSS", "Frontend", "Architecture"],
     coverImage: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80",
     author: {
-      name: "Alex Morgan",
+      name: "Sankar Velusamy",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
       role: "Principal Architect"
     },
@@ -149,7 +149,7 @@ When you build with pure JavaScript, your bundle size is negligible, your execut
     tags: ["JavaScript", "Performance", "CoreWebVitals"],
     coverImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
     author: {
-      name: "Alex Morgan",
+      name: "Sankar Velusamy",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
       role: "Principal Architect"
     },
@@ -204,7 +204,7 @@ Document architectural decisions with lightweight ADRs (Architecture Decision Re
     tags: ["Career", "Mindset", "Leadership"],
     coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
     author: {
-      name: "Alex Morgan",
+      name: "Sankar Velusamy",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
       role: "Principal Architect"
     },
@@ -246,9 +246,15 @@ const Storage = {
       return DEFAULT_USER;
     }
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (parsed.name === "Alex Morgan" || parsed.email === "alex@blogspace.dev") {
+        parsed.name = "Sankar Velusamy";
+        parsed.email = "sankar@blogspace.dev";
+        localStorage.setItem("blogspace_currentUser_v2", JSON.stringify(parsed));
+      }
+      return parsed;
     } catch (e) {
-      return null;
+      return DEFAULT_USER;
     }
   },
 

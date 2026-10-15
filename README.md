@@ -24,7 +24,7 @@
 
 ### 2. 🔐 Authentication Pages (`login.html` & `register.html`)
 - **Modern Glassmorphic Cards:** Glowing borders, subtle backdrops, and accessible floating inputs.
-- **Quick Demo Fill:** One-click tester button to autofill credentials (`alex@blogspace.dev` / `password123`) for rapid grading and review.
+- **Quick Demo Fill:** One-click tester button to autofill credentials (`sankar@blogspace.dev` / `password123`) for rapid grading and review.
 - **Password Visibility Toggle:** Show / hide password eye button.
 - **Form Validation:** Client-side validation for email formats and password matching (min 6 characters).
 - **Auto-Login:** Registered users are saved to the local registry and automatically logged in.
@@ -102,7 +102,7 @@ Then visit: `http://localhost:8080`
 ## 🔑 Demo Login Credentials
 
 For convenience during assessment:
-- **Email:** `alex@blogspace.dev`
+- **Email:** `sankar@blogspace.dev`
 - **Password:** `password123`
 *(Or click the "Fill Demo" button on `login.html`)*
 
