@@ -19,3 +19,7 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local Screenshots
+screenshot_*.png
+*.png
