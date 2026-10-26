@@ -4,7 +4,7 @@
  */
 
 const http = require("http");
-const app = require("./server/server");
+const app = require("./server");
 
 const PORT = 5099; // Test port
 let server;

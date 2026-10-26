@@ -35,8 +35,8 @@ app.use((req, res, next) => {
 // ==========================================
 // 2. Static Frontend Serving
 // ==========================================
-// Serve the frontend static files directly from project root
-const publicDirectory = path.join(__dirname, "..");
+// Serve the frontend static files from the frontend directory
+const publicDirectory = path.join(__dirname, "..", "frontend");
 app.use(express.static(publicDirectory));
 
 // ==========================================

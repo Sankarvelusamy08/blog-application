@@ -28,5 +28,15 @@
     "role": "Full Stack Engineer",
     "bio": "Writing technical deep-dives on BlogSpace.",
     "createdAt": "2026-10-26T06:41:07.843Z"
+  },
+  {
+    "id": "user-1793004394954-ndfos",
+    "name": "Alex Dev",
+    "email": "test_1793004394887@test.com",
+    "password": "$2b$10$BkWdYZKx2wDwF4o7wRvfxu8qdceDrvjzd68C/3f9dnnbLU0wZdgeG",
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+    "role": "Full Stack Engineer",
+    "bio": "Writing technical deep-dives on BlogSpace.",
+    "createdAt": "2026-10-26T08:46:34.954Z"
   }
 ]
