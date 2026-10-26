@@ -390,7 +390,31 @@ function setupGlobalEnhancements() {
 function setupNavbar() {
   const user = Storage.getUser();
   const navAuthContainer = document.getElementById("navAuthContainer");
-  
+
+  // Render and ping API Status Badge
+  const navActions = document.querySelector(".nav-actions");
+  if (navActions && !document.getElementById("apiStatusPill")) {
+    const pill = document.createElement("div");
+    pill.id = "apiStatusPill";
+    pill.className = "api-status-pill";
+    pill.innerHTML = `<span class="pulse-dot"></span><span>API Connecting...</span>`;
+    navActions.insertBefore(pill, navActions.firstChild);
+
+    if (window.BlogAPI) {
+      BlogAPI.checkHealth().then((health) => {
+        if (health.online) {
+          pill.className = "api-status-pill";
+          pill.innerHTML = `<span class="pulse-dot"></span><span>API: Node.js (Port 5000)</span>`;
+          pill.title = "Connected to Node.js / Express.js REST API";
+        } else {
+          pill.className = "api-status-pill offline";
+          pill.innerHTML = `<span class="pulse-dot"></span><span>API: Local Mode</span>`;
+          pill.title = "Backend server offline. Run 'npm start' on port 5000.";
+        }
+      });
+    }
+  }
+
   if (navAuthContainer) {
     if (user) {
       navAuthContainer.innerHTML = `
@@ -437,6 +461,7 @@ function setupNavbar() {
       const logoutBtn = document.getElementById("logoutBtn");
       if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
+          if (window.BlogAPI) BlogAPI.auth.logout();
           Storage.setUser(null);
           showToast("Session ended. Redirecting...", "info");
           setTimeout(() => window.location.href = "login.html", 600);
@@ -464,7 +489,7 @@ function setupNavbar() {
 // 7. Home Page Controller (index.html)
 // ==========================================
 function initHomePage() {
-  const posts = Storage.getPosts();
+  let posts = Storage.getPosts();
   let currentCategory = "All";
   let searchKeyword = "";
 
@@ -472,6 +497,17 @@ function initHomePage() {
   const postsGrid = document.getElementById("postsGrid");
   const categoryPillsContainer = document.getElementById("categoryFilters");
   const searchInput = document.getElementById("homeSearchInput");
+
+  // Fetch live articles from REST API
+  if (window.BlogAPI) {
+    BlogAPI.blogs.getAll().then((res) => {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        posts = res.data;
+        Storage.savePosts(posts);
+        filterAndRender();
+      }
+    }).catch(() => {});
+  }
 
   // Render Category Filter buttons
   const categories = ["All", "Web Dev", "Design", "AI & ML", "Technology", "Productivity"];
@@ -607,7 +643,7 @@ function initHomePage() {
 }
 
 // Global Like Handler
-window.handleLikeClick = function(postId) {
+window.handleLikeClick = async function(postId) {
   const posts = Storage.getPosts();
   const post = posts.find(p => p.id === postId);
   if (!post) return;
@@ -621,6 +657,12 @@ window.handleLikeClick = function(postId) {
     likeCountEl.parentElement.classList.add("liked");
   }
   showToast("Endorsed story!", "success");
+
+  if (window.BlogAPI) {
+    try {
+      await BlogAPI.blogs.like(postId);
+    } catch (e) {}
+  }
 };
 
 // ==========================================
@@ -638,76 +680,99 @@ function initDashboardPage() {
     greetingEl.textContent = `Welcome back, ${user.name.split(" ")[0]} 👋`;
   }
 
-  const posts = Storage.getPosts();
-  const userPosts = posts.filter(p => p.author && p.author.name === user.name);
-  const displayPosts = userPosts.length > 0 ? userPosts : posts.slice(0, 5);
+  function renderMetricsAndTable(posts) {
+    const userPosts = posts.filter(p => p.author && p.author.name === user.name);
+    const displayPosts = userPosts.length > 0 ? userPosts : posts.slice(0, 5);
 
-  // Compute metrics
-  const totalPostsCount = displayPosts.length;
-  const totalViewsCount = displayPosts.reduce((acc, curr) => acc + (curr.views || 0), 0);
-  const totalLikesCount = displayPosts.reduce((acc, curr) => acc + (curr.likes || 0), 0);
-  const totalCommentsCount = displayPosts.reduce((acc, curr) => acc + (curr.comments ? curr.comments.length : 0), 0);
+    // Compute metrics
+    const totalPostsCount = displayPosts.length;
+    const totalViewsCount = displayPosts.reduce((acc, curr) => acc + (curr.views || 0), 0);
+    const totalLikesCount = displayPosts.reduce((acc, curr) => acc + (curr.likes || 0), 0);
+    const totalCommentsCount = displayPosts.reduce((acc, curr) => acc + (curr.comments ? curr.comments.length : 0), 0);
 
-  const statTotalPosts = document.getElementById("statTotalPosts");
-  const statTotalViews = document.getElementById("statTotalViews");
-  const statTotalLikes = document.getElementById("statTotalLikes");
-  const statTotalComments = document.getElementById("statTotalComments");
+    const statTotalPosts = document.getElementById("statTotalPosts");
+    const statTotalViews = document.getElementById("statTotalViews");
+    const statTotalLikes = document.getElementById("statTotalLikes");
+    const statTotalComments = document.getElementById("statTotalComments");
 
-  if (statTotalPosts) statTotalPosts.textContent = totalPostsCount;
-  if (statTotalViews) statTotalViews.textContent = totalViewsCount.toLocaleString();
-  if (statTotalLikes) statTotalLikes.textContent = totalLikesCount.toLocaleString();
-  if (statTotalComments) statTotalComments.textContent = totalCommentsCount;
+    if (statTotalPosts) statTotalPosts.textContent = totalPostsCount;
+    if (statTotalViews) statTotalViews.textContent = totalViewsCount.toLocaleString();
+    if (statTotalLikes) statTotalLikes.textContent = totalLikesCount.toLocaleString();
+    if (statTotalComments) statTotalComments.textContent = totalCommentsCount;
 
-  // Render Table with Status Chips
-  const tableBody = document.getElementById("dashboardPostsTableBody");
-  if (tableBody) {
-    if (displayPosts.length === 0) {
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="empty-state">
-            <div class="empty-state-icon">✍️</div>
-            <h4>You haven't published any stories yet</h4>
-            <a href="create-blog.html" class="btn btn-primary btn-sm" style="margin-top: 1rem;">Start Your First Story</a>
+    // Render Table with Status Chips
+    const tableBody = document.getElementById("dashboardPostsTableBody");
+    if (tableBody) {
+      if (displayPosts.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-state-icon">✍️</div>
+              <h4>You haven't published any stories yet</h4>
+              <a href="create-blog.html" class="btn btn-primary btn-sm" style="margin-top: 1rem;">Start Your First Story</a>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = displayPosts.map(post => `
+        <tr id="row-${post.id}">
+          <td>
+            <div class="table-post-cell">
+              <img src="${post.coverImage}" alt="${post.title}" class="table-post-img" />
+              <div>
+                <a href="post.html?id=${post.id}" class="table-post-title">${post.title}</a>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">${post.category} · ${post.readTime}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-emerald" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">Published</span>
+          </td>
+          <td style="color: var(--text-muted); font-size: 0.875rem;">${post.publishedAt}</td>
+          <td><strong>${(post.views || 0).toLocaleString()}</strong></td>
+          <td><strong>${post.likes || 0}</strong></td>
+          <td>
+            <div class="action-buttons">
+              <a href="post.html?id=${post.id}" class="btn btn-secondary btn-sm" title="View Story">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </a>
+              <button class="btn btn-danger btn-sm" onclick="handleDeletePost('${post.id}')" title="Delete Story">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
           </td>
         </tr>
-      `;
-      return;
+      `).join("");
     }
+  }
 
-    tableBody.innerHTML = displayPosts.map(post => `
-      <tr id="row-${post.id}">
-        <td>
-          <div class="table-post-cell">
-            <img src="${post.coverImage}" alt="${post.title}" class="table-post-img" />
-            <div>
-              <a href="post.html?id=${post.id}" class="table-post-title">${post.title}</a>
-              <span style="font-size: 0.8rem; color: var(--text-dim);">${post.category} · ${post.readTime}</span>
-            </div>
-          </div>
-        </td>
-        <td>
-          <span class="badge badge-emerald" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">Published</span>
-        </td>
-        <td style="color: var(--text-muted); font-size: 0.875rem;">${post.publishedAt}</td>
-        <td><strong>${(post.views || 0).toLocaleString()}</strong></td>
-        <td><strong>${post.likes || 0}</strong></td>
-        <td>
-          <div class="action-buttons">
-            <a href="post.html?id=${post.id}" class="btn btn-secondary btn-sm" title="View Story">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </a>
-            <button class="btn btn-danger btn-sm" onclick="handleDeletePost('${post.id}')" title="Delete Story">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `).join("");
+  // Initial render from local cache
+  renderMetricsAndTable(Storage.getPosts());
+
+  // Live fetch from REST API
+  if (window.BlogAPI) {
+    BlogAPI.blogs.getAll().then((res) => {
+      if (res.success && Array.isArray(res.data)) {
+        Storage.savePosts(res.data);
+        renderMetricsAndTable(res.data);
+      }
+    }).catch(() => {});
   }
 }
 
-window.handleDeletePost = function(postId) {
+window.handleDeletePost = async function(postId) {
   if (!confirm("Are you sure you want to delete this story?")) return;
+
+  if (window.BlogAPI) {
+    try {
+      const res = await BlogAPI.blogs.delete(postId);
+      if (res.success) {
+        showToast("Story deleted from API server", "info");
+      }
+    } catch (e) {}
+  }
 
   let posts = Storage.getPosts();
   posts = posts.filter(p => p.id !== postId);
@@ -715,7 +780,6 @@ window.handleDeletePost = function(postId) {
 
   const row = document.getElementById(`row-${postId}`);
   if (row) row.remove();
-  showToast("Story deleted from store", "info");
   setTimeout(() => initDashboardPage(), 400);
 };
 
@@ -817,7 +881,7 @@ function initCreateBlogPage() {
 
   // Form submit
   if (form) {
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const title = document.getElementById("blogTitleInput").value.trim();
@@ -834,11 +898,15 @@ function initCreateBlogPage() {
       const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim().replace(/^#/, "")) : [category];
       const readMinutes = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
 
-      const newPost = {
-        id: "post-" + Date.now(),
+      const submitBtn = form.querySelector("button[type='submit']");
+      const origBtnHtml = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>Broadcasting...</span>`;
+      }
+
+      const postPayload = {
         title,
-        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-        excerpt: content.substring(0, 160).replace(/[#*`]/g, "") + "...",
         content,
         category,
         tags,
@@ -847,23 +915,56 @@ function initCreateBlogPage() {
           name: user.name,
           avatar: user.avatar,
           role: user.role || "Author"
-        },
-        publishedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-        readTime: `${readMinutes} min read`,
-        views: 1,
-        likes: 0,
-        status: "Published",
-        comments: [],
-        featured: false
+        }
       };
 
+      let createdPost = null;
+
+      if (window.BlogAPI) {
+        try {
+          const res = await BlogAPI.blogs.create(postPayload);
+          if (res.success && res.data) {
+            createdPost = res.data;
+          } else {
+            showToast(res.message || "Could not publish to API", "error");
+          }
+        } catch (apiErr) {
+          console.warn("API publish failed, falling back to local:", apiErr);
+        }
+      }
+
+      if (!createdPost) {
+        createdPost = {
+          id: "post-" + Date.now(),
+          title,
+          slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          excerpt: content.substring(0, 160).replace(/[#*`]/g, "") + "...",
+          content,
+          category,
+          tags,
+          coverImage,
+          author: {
+            name: user.name,
+            avatar: user.avatar,
+            role: user.role || "Author"
+          },
+          publishedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+          readTime: `${readMinutes} min read`,
+          views: 1,
+          likes: 0,
+          status: "Published",
+          comments: [],
+          featured: false
+        };
+      }
+
       const posts = Storage.getPosts();
-      posts.unshift(newPost);
+      posts.unshift(createdPost);
       Storage.savePosts(posts);
 
       showToast("🎉 Story broadcasted to BlogSpace!", "success");
       setTimeout(() => {
-        window.location.href = `post.html?id=${newPost.id}`;
+        window.location.href = `post.html?id=${createdPost.id}`;
       }, 900);
     });
   }
@@ -876,135 +977,160 @@ function initPostDetailPage() {
   const params = new URLSearchParams(window.location.search);
   const postId = params.get("id");
 
-  const posts = Storage.getPosts();
-  const post = posts.find(p => p.id === postId) || posts[0];
+  function renderPost(post, posts) {
+    document.title = `${post.title} — BlogSpace`;
 
-  if (!post) {
+    const detailContainer = document.getElementById("postDetailContainer");
+    if (detailContainer) {
+      const formattedBody = post.content
+        .split("\n\n")
+        .map(block => {
+          if (block.startsWith("```")) {
+            const code = block.replace(/```[a-z]*/g, "").trim();
+            return `<pre style="background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); overflow-x: auto; margin: 2rem 0; font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6;"><code>${escapeHtml(code)}</code></pre>`;
+          }
+          if (block.startsWith("## ")) return `<h2>${block.replace("## ", "")}</h2>`;
+          if (block.startsWith("### ")) return `<h3>${block.replace("### ", "")}</h3>`;
+          if (block.startsWith("> ")) return `<blockquote>${block.replace("> ", "")}</blockquote>`;
+          return `<p>${block}</p>`;
+        })
+        .join("");
+
+      detailContainer.innerHTML = `
+        <div class="post-header">
+          <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.25rem;">
+            <span class="badge badge-pink">${post.category}</span>
+            <span style="font-size: 0.875rem; color: var(--text-dim);">${post.publishedAt} · ${post.readTime}</span>
+          </div>
+
+          <h1 class="post-title">${post.title}</h1>
+
+          <div class="author-block" style="margin-top: 1.75rem;">
+            <img src="${post.author.avatar}" alt="${post.author.name}" class="avatar-img" style="width: 48px; height: 48px;" />
+            <div class="author-info">
+              <h5 style="font-size: 1.05rem;">${post.author.name}</h5>
+              <p>${post.author.role || 'Contributor'} · ${(post.views || 0).toLocaleString()} views</p>
+            </div>
+          </div>
+        </div>
+
+        <img src="${post.coverImage}" alt="${post.title}" class="post-hero-image" />
+
+        <div class="post-body">
+          ${formattedBody}
+        </div>
+
+        <!-- Interaction Bar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.75rem 0; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); margin: 3.5rem 0; flex-wrap: wrap; gap: 1rem;">
+          <button class="btn btn-outline" id="postLikeBtn" style="gap: 0.6rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <span id="postDetailLikeCount">${post.likes || 0}</span> Endorsements
+          </button>
+
+          <div style="display: flex; gap: 0.6rem;">
+            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(window.location.href); showToast('Article URL copied to clipboard!', 'success');">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Share Story</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+          <h3 style="font-size: 1.6rem; margin-bottom: 1.75rem;">Community Discussion (${post.comments ? post.comments.length : 0})</h3>
+          
+          <form id="commentForm" style="margin-bottom: 2.5rem;">
+            <div class="form-group">
+              <textarea id="commentInput" class="form-input" rows="3" placeholder="Share your architectural thoughts or feedback..." style="resize: vertical;" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+          </form>
+
+          <div id="commentsList">
+            ${(post.comments && post.comments.length > 0) ? post.comments.map(c => `
+              <div class="comment-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <strong style="font-size: 0.95rem; color: var(--text-main);">${c.name}</strong>
+                  <span style="font-size: 0.8rem; color: var(--text-dim);">${c.date}</span>
+                </div>
+                <p style="font-size: 0.925rem; color: var(--text-muted); line-height: 1.6;">${c.text}</p>
+              </div>
+            `).join("") : `<p style="color: var(--text-dim);">No discussions started yet. Be the first to share your perspective!</p>`}
+          </div>
+        </section>
+      `;
+
+      // Like Button
+      const postLikeBtn = document.getElementById("postLikeBtn");
+      if (postLikeBtn) {
+        postLikeBtn.addEventListener("click", async () => {
+          post.likes = (post.likes || 0) + 1;
+          Storage.savePosts(posts);
+          document.getElementById("postDetailLikeCount").textContent = post.likes;
+          showToast("Endorsement registered!", "success");
+
+          if (window.BlogAPI) {
+            try {
+              await BlogAPI.blogs.like(post.id);
+            } catch (e) {}
+          }
+        });
+      }
+
+      // Comment Submission
+      const commentForm = document.getElementById("commentForm");
+      if (commentForm) {
+        commentForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const text = document.getElementById("commentInput").value.trim();
+          if (!text) return;
+
+          const currentUser = Storage.getUser() || { name: "Guest Engineer" };
+          const newComment = {
+            id: "c-" + Date.now(),
+            name: currentUser.name,
+            text,
+            date: "Just now"
+          };
+
+          if (window.BlogAPI) {
+            try {
+              await BlogAPI.blogs.addComment(post.id, { text, name: currentUser.name });
+            } catch (e) {}
+          }
+
+          if (!post.comments) post.comments = [];
+          post.comments.push(newComment);
+          Storage.savePosts(posts);
+
+          showToast("Comment submitted!", "success");
+          initPostDetailPage();
+        });
+      }
+    }
+  }
+
+  const posts = Storage.getPosts();
+  let post = posts.find(p => p.id === postId) || posts[0];
+
+  if (!post && !postId) {
     window.location.href = "index.html";
     return;
   }
 
-  // Increment view telemetry
-  post.views = (post.views || 0) + 1;
-  Storage.savePosts(posts);
+  if (post) {
+    post.views = (post.views || 0) + 1;
+    Storage.savePosts(posts);
+    renderPost(post, posts);
+  }
 
-  document.title = `${post.title} — BlogSpace`;
-
-  const detailContainer = document.getElementById("postDetailContainer");
-  if (detailContainer) {
-    const formattedBody = post.content
-      .split("\n\n")
-      .map(block => {
-        if (block.startsWith("```")) {
-          const code = block.replace(/```[a-z]*/g, "").trim();
-          return `<pre style="background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); overflow-x: auto; margin: 2rem 0; font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6;"><code>${escapeHtml(code)}</code></pre>`;
-        }
-        if (block.startsWith("## ")) return `<h2>${block.replace("## ", "")}</h2>`;
-        if (block.startsWith("### ")) return `<h3>${block.replace("### ", "")}</h3>`;
-        if (block.startsWith("> ")) return `<blockquote>${block.replace("> ", "")}</blockquote>`;
-        return `<p>${block}</p>`;
-      })
-      .join("");
-
-    detailContainer.innerHTML = `
-      <div class="post-header">
-        <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.25rem;">
-          <span class="badge badge-pink">${post.category}</span>
-          <span style="font-size: 0.875rem; color: var(--text-dim);">${post.publishedAt} · ${post.readTime}</span>
-        </div>
-
-        <h1 class="post-title">${post.title}</h1>
-
-        <div class="author-block" style="margin-top: 1.75rem;">
-          <img src="${post.author.avatar}" alt="${post.author.name}" class="avatar-img" style="width: 48px; height: 48px;" />
-          <div class="author-info">
-            <h5 style="font-size: 1.05rem;">${post.author.name}</h5>
-            <p>${post.author.role || 'Contributor'} · ${(post.views || 0).toLocaleString()} views</p>
-          </div>
-        </div>
-      </div>
-
-      <img src="${post.coverImage}" alt="${post.title}" class="post-hero-image" />
-
-      <div class="post-body">
-        ${formattedBody}
-      </div>
-
-      <!-- Interaction Bar -->
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.75rem 0; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); margin: 3.5rem 0; flex-wrap: wrap; gap: 1rem;">
-        <button class="btn btn-outline" id="postLikeBtn" style="gap: 0.6rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          <span id="postDetailLikeCount">${post.likes || 0}</span> Endorsements
-        </button>
-
-        <div style="display: flex; gap: 0.6rem;">
-          <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(window.location.href); showToast('Article URL copied to clipboard!', 'success');">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>Share Story</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Comments Section -->
-      <section class="comments-section">
-        <h3 style="font-size: 1.6rem; margin-bottom: 1.75rem;">Community Discussion (${post.comments ? post.comments.length : 0})</h3>
-        
-        <form id="commentForm" style="margin-bottom: 2.5rem;">
-          <div class="form-group">
-            <textarea id="commentInput" class="form-input" rows="3" placeholder="Share your architectural thoughts or feedback..." style="resize: vertical;" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
-        </form>
-
-        <div id="commentsList">
-          ${(post.comments && post.comments.length > 0) ? post.comments.map(c => `
-            <div class="comment-card">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <strong style="font-size: 0.95rem; color: var(--text-main);">${c.name}</strong>
-                <span style="font-size: 0.8rem; color: var(--text-dim);">${c.date}</span>
-              </div>
-              <p style="font-size: 0.925rem; color: var(--text-muted); line-height: 1.6;">${c.text}</p>
-            </div>
-          `).join("") : `<p style="color: var(--text-dim);">No discussions started yet. Be the first to share your perspective!</p>`}
-        </div>
-      </section>
-    `;
-
-    // Like Button
-    const postLikeBtn = document.getElementById("postLikeBtn");
-    if (postLikeBtn) {
-      postLikeBtn.addEventListener("click", () => {
-        post.likes = (post.likes || 0) + 1;
-        Storage.savePosts(posts);
-        document.getElementById("postDetailLikeCount").textContent = post.likes;
-        showToast("Endorsement registered!", "success");
-      });
-    }
-
-    // Comment Submission
-    const commentForm = document.getElementById("commentForm");
-    if (commentForm) {
-      commentForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = document.getElementById("commentInput").value.trim();
-        if (!text) return;
-
-        const currentUser = Storage.getUser() || { name: "Guest Engineer" };
-        const newComment = {
-          id: "c-" + Date.now(),
-          name: currentUser.name,
-          text,
-          date: "Just now"
-        };
-
-        if (!post.comments) post.comments = [];
-        post.comments.push(newComment);
-        Storage.savePosts(posts);
-
-        showToast("Comment submitted!", "success");
-        initPostDetailPage();
-      });
-    }
+  // Fetch live from REST API
+  if (postId && window.BlogAPI) {
+    BlogAPI.blogs.getById(postId).then((res) => {
+      if (res.success && res.data) {
+        renderPost(res.data, posts);
+      }
+    }).catch(() => {});
   }
 }
 
@@ -1038,11 +1164,41 @@ function initLoginPage() {
   }
 
   if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
 
+      const submitBtn = loginForm.querySelector("button[type='submit']");
+      const origBtnText = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Authenticating...";
+      }
+
+      // Try Backend REST API first
+      if (window.BlogAPI) {
+        try {
+          const res = await BlogAPI.auth.login({ email, password });
+          if (res.success && res.user) {
+            Storage.setUser(res.user);
+            showToast(`Welcome back, ${res.user.name}!`, "success");
+            setTimeout(() => window.location.href = "dashboard.html", 700);
+            return;
+          } else if (!res.offline) {
+            showToast(res.message || "Invalid credentials.", "error");
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnText;
+            }
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("API login failed, falling back to local store:", apiErr);
+        }
+      }
+
+      // Local fallback if API server is offline
       const users = Storage.getUsersList();
       const matched = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
 
@@ -1053,6 +1209,10 @@ function initLoginPage() {
         setTimeout(() => window.location.href = "dashboard.html", 700);
       } else {
         showToast("Invalid credentials. Click 'Fill Demo' to evaluate instantly.", "error");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origBtnText;
+        }
       }
     });
   }
@@ -1066,7 +1226,7 @@ function initRegisterPage() {
   const confirmPasswordInput = document.getElementById("regConfirmPassword");
 
   if (registerForm) {
-    registerForm.addEventListener("submit", (e) => {
+    registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = nameInput.value.trim();
       const email = emailInput.value.trim();
@@ -1083,6 +1243,42 @@ function initRegisterPage() {
         return;
       }
 
+      const submitBtn = registerForm.querySelector("button[type='submit']");
+      const origBtnText = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Creating Author Account...";
+      }
+
+      // Try Backend REST API first
+      if (window.BlogAPI) {
+        try {
+          const res = await BlogAPI.auth.register({
+            name,
+            email,
+            password,
+            confirmPassword
+          });
+
+          if (res.success && res.user) {
+            Storage.setUser(res.user);
+            showToast("🎉 Author account registered! Redirecting...", "success");
+            setTimeout(() => window.location.href = "dashboard.html", 700);
+            return;
+          } else if (!res.offline) {
+            showToast(res.message || "Registration failed.", "error");
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnText;
+            }
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("API registration failed, falling back to local store:", apiErr);
+        }
+      }
+
+      // Local fallback if API server is offline
       const newUser = {
         id: "user-" + Date.now(),
         name,

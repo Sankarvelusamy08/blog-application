@@ -71,31 +71,75 @@ BlogSpace/
 ├── css/
 │   └── style.css       # Complete design system, themes, and animations
 ├── js/
-│   └── app.js          # Core app state, storage, auth, and controllers
+│   ├── api.js          # REST API client & JWT token manager
+│   └── app.js          # Core app state, controllers, and reactive views
+├── server/
+│   ├── config/
+│   │   └── config.js   # Environment configuration
+│   ├── controllers/
+│   │   ├── authController.js  # Registration, login & profile logic
+│   │   └── blogController.js  # Blog CRUD, likes & comments logic
+│   ├── middleware/
+│   │   ├── authMiddleware.js  # JWT authentication verification
+│   │   └── errorHandler.js    # Global error handling
+│   ├── storage/
+│   │   ├── db.js              # JSON file-based database engine
+│   │   └── initialSeed.js     # Default user & articles seed data
+│   ├── data/                  # Auto-generated JSON storage
+│   │   ├── users.json
+│   │   └── posts.json
+│   └── server.js       # Express application configuration
+├── server.js           # Server launch entrypoint
+├── test-api.js         # Automated REST API test suite
+├── package.json        # Dependencies & scripts
+├── .env                # Environment variables
 ├── .gitignore          # Git ignore rules
 └── README.md           # Project documentation and submission guide
 ```
 
 ---
 
-## 🚀 How to Run Locally
+## 🚀 How to Run the Backend & Application
 
-Because this project is built using native web technologies (HTML, CSS, JS), no build steps or package installations are required!
+### 1. Start the Node.js / Express Server
+Install dependencies (if not already installed) and start the server:
 
-### Option 1: Direct File Opening
-Double-click `index.html` in your file explorer to open it directly in any modern browser (Chrome, Edge, Firefox, Safari).
-
-### Option 2: Using VS Code Live Server
-1. Open this repository folder in VS Code.
-2. Right-click `index.html` and click **"Open with Live Server"**.
-3. The application will launch at `http://127.0.0.1:5500/index.html`.
-
-### Option 3: Python Built-in Server
-Open your terminal in the project directory and run:
 ```bash
-python -m http.server 8080
+npm install
+npm start
 ```
-Then visit: `http://localhost:8080`
+*Or for hot-reloading development:*
+```bash
+npm run dev
+```
+
+The Express server will start at:
+- **Web Application:** `http://localhost:5000`
+- **REST API Base URL:** `http://localhost:5000/api`
+
+### 2. Run the Automated API Test Suite
+Run the comprehensive 12-point automated test suite:
+```bash
+npm test
+```
+
+---
+
+## 📡 REST API Documentation
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/api` | API Info, health status & endpoint discovery | No |
+| `GET` | `/api/health` | Server uptime and health probe | No |
+| `POST` | `/api/auth/register` | Register new user account (hashes password with bcrypt) | No |
+| `POST` | `/api/auth/login` | Authenticate user & issue signed JWT token | No |
+| `GET` | `/api/auth/me` | Fetch authenticated user profile | Yes (`Bearer <token>`) |
+| `GET` | `/api/blogs` | Get all articles (filters: `?category=`, `?search=`, `?author=`) | No |
+| `GET` | `/api/blogs/:id` | Get single blog by ID/slug & increment views | No |
+| `POST` | `/api/blogs` | Create & publish new story with author attribution | Optional (JWT/body) |
+| `POST` | `/api/blogs/:id/like` | Endorse / like an article | No |
+| `POST` | `/api/blogs/:id/comments` | Post a discussion comment | Optional |
+| `DELETE` | `/api/blogs/:id` | Delete article from platform | No |
 
 ---
 
@@ -109,12 +153,23 @@ For convenience during assessment:
 ---
 
 ## 🛠️ Technologies Used
+
+### Frontend:
 - **HTML5:** Semantic structure, accessible forms, meta SEO tags.
 - **Vanilla CSS3:** Custom properties (CSS variables), Flexbox, CSS Grid, Glassmorphism backdrop-filters, keyframe animations, media queries.
-- **Vanilla JavaScript (ES6+):** Arrow functions, template literals, DOM manipulation, URLSearchParams, Event Delegation, LocalStorage API.
+- **Vanilla JavaScript (ES6+):** Arrow functions, template literals, DOM manipulation, URLSearchParams, Event Delegation.
+- **REST API Integration (`js/api.js`):** Unified fetch wrapper, JWT bearer token management, resilient offline fallbacks.
+
+### Backend:
+- **Node.js (v24+):** High-throughput runtime environment.
+- **Express.js (v5+):** REST API framework, CORS middleware, JSON body parsing, route structuring.
+- **Bcrypt.js:** Cryptographic password hashing (salt rounds: 10).
+- **JSONWebToken (JWT):** Stateless bearer token authentication.
+- **JSON Storage Engine:** Atomic file-based persistence for `users.json` and `posts.json`.
 
 ---
 
 ## 👨‍💻 Author
-- **Project:** Module 1: Frontend Development Submission
-- **Repository:** [GitHub Repository](https://github.com/)
+- **Project:** Module 2: Backend Development & REST API Integration
+- **Repository:** [GitHub Repository](https://github.com/Sankarvelusamy08/blog-application)
+

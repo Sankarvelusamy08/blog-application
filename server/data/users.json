@@ -1,0 +1,32 @@
+[
+  {
+    "id": "user-1",
+    "name": "Sankar Velusamy",
+    "email": "sankar@blogspace.dev",
+    "password": "$2b$10$MjCdVI.3bwf22hUM/sVB8e0GMALigdgAfe.8vnow4/9rHMcCCxoHW",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+    "role": "Principal Frontend Architect",
+    "bio": "Specializing in high-throughput distributed frontend systems, design tokens, and web performance.",
+    "createdAt": "2026-09-01T08:00:00.000Z"
+  },
+  {
+    "id": "user-1792995607461-7xdiz",
+    "name": "Alex Dev",
+    "email": "test_1792995607378@test.com",
+    "password": "$2b$10$zGSEo2topXFHH4SapAAncuSSzYeiT34IOUYQ4il7Y7Lepbq6zlZvu",
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+    "role": "Full Stack Engineer",
+    "bio": "Writing technical deep-dives on BlogSpace.",
+    "createdAt": "2026-10-26T06:20:07.461Z"
+  },
+  {
+    "id": "user-1792996867843-mfc4t",
+    "name": "Alex Dev",
+    "email": "test_1792996867775@test.com",
+    "password": "$2b$10$LWRV2KUR0gOx.VHaqG5ky.c9juJpTYZl77kjDN4ek49OPQB0p9LUW",
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+    "role": "Full Stack Engineer",
+    "bio": "Writing technical deep-dives on BlogSpace.",
+    "createdAt": "2026-10-26T06:41:07.843Z"
+  }
+]

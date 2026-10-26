@@ -337,6 +337,32 @@ img {
   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
+.api-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--accent-emerald);
+  transition: var(--transition);
+  user-select: none;
+}
+
+.api-status-pill.offline {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: var(--accent-amber);
+}
+
+.api-status-pill.offline .pulse-dot {
+  background-color: var(--accent-amber);
+  animation: none;
+}
+
 /* ==========================================================================
    Header & Sticky Glass Navbar
    ========================================================================== */
